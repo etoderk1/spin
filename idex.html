@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://i.postimg.cc/2yX2tNY5/logo-no-Fon.png" type="image/x-icon">
+    <title>SpinBox | RGB Генератор</title>
+    <style>
+        :root {
+            --primary: #4FC3F7;
+            --primary-dark: #0288D1;
+            --primary-darker: #01579B;
+            --secondary: #1E293B;
+            --dark: #0F172A;
+            --darker: #020617;
+            --accent: #00BCD4;
+            --gradient: linear-gradient(135deg, #4FC3F7 0%, #0288D1 50%, #01579B 100%);
+            --bg-gradient: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #0F172A 100%);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-gradient);
+            color: #E2E8F0;
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(79, 195, 247, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(2, 136, 209, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(1, 87, 155, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 15px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            flex-shrink: 0;
+        }
+        
+        .logo {
+            font-size: 2.8rem;
+            margin: 0;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 30px rgba(79, 195, 247, 0.5);
+            position: relative;
+            display: inline-block;
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+        
+        .logo::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 3px;
+            background: var(--gradient);
+            border-radius: 3px;
+            box-shadow: 0 0 15px rgba(79, 195, 247, 0.5);
+        }
+        
+        .tagline {
+            color: #94A3B8;
+            font-size: 1rem;
+            margin-top: 15px;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+        
+        .tool-container {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 25px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(79, 195, 247, 0.2);
+            box-shadow: 
+                0 15px 40px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            min-height: 0;
+        }
+        
+        .tool-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient);
+            box-shadow: 0 0 15px rgba(79, 195, 247, 0.5);
+        }
+        
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .floating-element {
+            position: absolute;
+            background: var(--gradient);
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .floating-element:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            top: 10%;
+            left: 5%;
+            animation-delay: 0s;
+        }
+        
+        .floating-element:nth-child(2) {
+            width: 50px;
+            height: 50px;
+            top: 60%;
+            right: 10%;
+            animation-delay: 2s;
+        }
+        
+        .floating-element:nth-child(3) {
+            width: 60px;
+            height: 60px;
+            bottom: 20%;
+            left: 15%;
+            animation-delay: 4s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(180deg); }
+        }
+        
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        .input-section {
+            flex-shrink: 0;
+        }
+        
+        .control-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #E2E8F0;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        
+        input[type="text"], input[type="color"], select {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(79, 195, 247, 0.3);
+            border-radius: 10px;
+            color: #E2E8F0;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            box-shadow: 
+                0 3px 8px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+        
+        input[type="color"] {
+            height: 50px;
+            padding: 6px;
+            cursor: pointer;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        input[type="text"]:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 
+                0 0 0 2px rgba(79, 195, 247, 0.2),
+                0 3px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .color-pickers {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .rgb-controls {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .preview-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        
+        .preview {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(79, 195, 247, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            flex: 1;
+            font-size: 1.2rem;
+            line-height: 1.4;
+            font-family: 'Arial Unicode MS', Arial, sans-serif;
+            box-shadow: 
+                inset 0 2px 6px rgba(0, 0, 0, 0.3),
+                0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            min-height: 80px;
+        }
+        
+        .result-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        
+        .result-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        .result {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(79, 195, 247, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            flex: 1;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: #E2E8F0;
+            box-shadow: 
+                inset 0 2px 6px rgba(0, 0, 0, 0.3),
+                0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            font-size: 1rem;
+            line-height: 1.4;
+            padding-right: 120px;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--gradient);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 
+                0 4px 12px rgba(2, 136, 209, 0.4),
+                0 2px 4px rgba(0, 0, 0, 0.3);
+            z-index: 2;
+        }
+        
+        .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 6px 15px rgba(2, 136, 209, 0.6),
+                0 3px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        .copy-btn:active {
+            transform: translateY(0);
+        }
+        
+        .copy-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--gradient);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            transform: translateX(400px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 1000;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .copy-notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        
+        h3 {
+            color: #E2E8F0;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 4px;
+            font-weight: 700;
+        }
+        
+        h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 30px;
+            height: 2px;
+            background: var(--gradient);
+            border-radius: 2px;
+            box-shadow: 0 0 8px rgba(79, 195, 247, 0.5);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+                height: 100vh;
+            }
+            
+            .logo {
+                font-size: 2.2rem;
+            }
+            
+            .tool-container {
+                padding: 20px 15px;
+            }
+            
+            .color-pickers {
+                grid-template-columns: 1fr;
+            }
+            
+            .result {
+                padding-right: 20px;
+            }
+            
+            .copy-btn {
+                position: relative;
+                top: auto;
+                right: auto;
+                display: block;
+                margin-top: 10px;
+                width: 100%;
+            }
+        }
+        
+        .glow-text {
+            text-shadow: 0 0 8px rgba(79, 195, 247, 0.4);
+        }
+        
+        /* Убираем скроллбар но оставляем функциональность */
+        .preview::-webkit-scrollbar,
+        .result::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .preview::-webkit-scrollbar-track,
+        .result::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 3px;
+        }
+        
+        .preview::-webkit-scrollbar-thumb,
+        .result::-webkit-scrollbar-thumb {
+            background: var(--gradient);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="logo">SpinBox</h1>
+            <p class="tagline">Преобразуйте текст в стильные RGB-градиенты</p>
+        </header>
+        
+        <div class="tool-container">
+            <div class="floating-elements">
+                <div class="floating-element"></div>
+                <div class="floating-element"></div>
+                <div class="floating-element"></div>
+            </div>
+            
+            <div class="content-area">
+                <div class="input-section">
+                    <div class="control-group">
+                        <label for="textInput">Текст (автоматически преобразуется в мелкий шрифт):</label>
+                        <input type="text" id="textInput" placeholder="Введите текст для градиента">
+                    </div>
+                    
+                    <div class="color-pickers">
+                        <div class="color-picker">
+                            <label for="startColor">Начальный цвет:</label>
+                            <input type="color" id="startColor" value="#4FC3F7">
+                        </div>
+                        
+                        <div class="color-picker">
+                            <label for="endColor">Конечный цвет:</label>
+                            <input type="color" id="endColor" value="#0288D1">
+                        </div>
+                    </div>
+                    
+                    <div class="rgb-controls">
+                        <div class="control-group">
+                            <label for="effect">Эффект:</label>
+                            <select id="effect">
+                                <option value="none">Без эффекта</option>
+                                <option value="bold">Жирный</option>
+                                <option value="italic">Курсив</option>
+                                <option value="underline">Подчеркнутый</option>
+                                <option value="strikethrough">Зачеркнутый</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="preview-section">
+                    <h3>Предпросмотр:</h3>
+                    <div class="preview" id="preview"></div>
+                </div>
+                
+                <div class="result-section">
+                    <h3>Результат:</h3>
+                    <div class="result-container">
+                        <div class="result" id="result"></div>
+                        <button class="copy-btn" id="copyResultBtn">
+                            📋 Копировать
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="copy-notification" id="copyNotification">
+        ✅ Текст успешно скопирован!
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const textInput = document.getElementById('textInput');
+            const startColor = document.getElementById('startColor');
+            const endColor = document.getElementById('endColor');
+            const effect = document.getElementById('effect');
+            const preview = document.getElementById('preview');
+            const result = document.getElementById('result');
+            const copyResultBtn = document.getElementById('copyResultBtn');
+            const copyNotification = document.getElementById('copyNotification');
+            
+            // Функция преобразования в мелкие заглавные буквы
+            function toSmallCaps(text) {
+                const smallCapsMap = {
+                    'a': 'ᴀ', 'b': 'ʙ', 'c': 'ᴄ', 'd': 'ᴅ', 'e': 'ᴇ',
+                    'f': 'ғ', 'g': 'ɢ', 'h': 'ʜ', 'i': 'ɪ', 'j': 'ᴊ',
+                    'k': 'ᴋ', 'l': 'ʟ', 'm': 'ᴍ', 'n': 'ɴ', 'o': 'ᴏ',
+                    'p': 'ᴘ', 'q': 'ǫ', 'r': 'ʀ', 's': 's', 't': 'ᴛ',
+                    'u': 'ᴜ', 'v': 'ᴠ', 'w': 'ᴡ', 'x': 'x', 'y': 'ʏ',
+                    'z': 'ᴢ'
+                };
+                
+                return text.split('').map(char => {
+                    const lowerChar = char.toLowerCase();
+                    return smallCapsMap[lowerChar] || char;
+                }).join('');
+            }
+            
+            // Генерация RGB кода
+            function generateRGB() {
+                const text = textInput.value;
+                if (!text) {
+                    preview.innerHTML = '<span style="color: #94A3B8;">Введите текст для генерации градиента...</span>';
+                    result.innerHTML = '';
+                    return;
+                }
+                
+                // Преобразуем текст в мелкий шрифт
+                const smallCapsText = toSmallCaps(text);
+                
+                const startHex = startColor.value.substring(1);
+                const endHex = endColor.value.substring(1);
+                const selectedEffect = effect.value;
+                
+                let rgbCode = '';
+                let previewHtml = '';
+                
+                // Генерация градиента
+                for (let i = 0; i < smallCapsText.length; i++) {
+                    const ratio = i / (smallCapsText.length - 1);
+                    const interpolatedColor = interpolateColor(startHex, endHex, ratio);
+                    
+                    // Добавляем эффекты
+                    let formatCodes = '';
+                    if (selectedEffect === 'bold') formatCodes = '&l';
+                    else if (selectedEffect === 'italic') formatCodes = '&o';
+                    else if (selectedEffect === 'underline') formatCodes = '&n';
+                    else if (selectedEffect === 'strikethrough') formatCodes = '&m';
+                    
+                    // Форматируем цвет в формат &x&r&r&g&g&b&b
+                    const r1 = interpolatedColor.substring(0, 1);
+                    const r2 = interpolatedColor.substring(1, 2);
+                    const g1 = interpolatedColor.substring(2, 3);
+                    const g2 = interpolatedColor.substring(3, 4);
+                    const b1 = interpolatedColor.substring(4, 5);
+                    const b2 = interpolatedColor.substring(5, 6);
+                    const formattedColor = `&x&${r1}&${r2}&${g1}&${g2}&${b1}&${b2}`;
+                    
+                    rgbCode += `${formattedColor}${formatCodes}${smallCapsText[i]}`;
+                    previewHtml += `<span style="color: #${interpolatedColor}; font-weight: ${selectedEffect === 'bold' ? 'bold' : 'normal'}; font-style: ${selectedEffect === 'italic' ? 'italic' : 'normal'}; text-decoration: ${selectedEffect === 'underline' ? 'underline' : 'none'} ${selectedEffect === 'strikethrough' ? 'line-through' : ''}" class="glow-text">${smallCapsText[i]}</span>`;
+                }
+                
+                preview.innerHTML = previewHtml;
+                result.innerHTML = rgbCode;
+            }
+            
+            // Интерполяция цвета
+            function interpolateColor(startHex, endHex, ratio) {
+                const r1 = parseInt(startHex.substring(0, 2), 16);
+                const g1 = parseInt(startHex.substring(2, 4), 16);
+                const b1 = parseInt(startHex.substring(4, 6), 16);
+                
+                const r2 = parseInt(endHex.substring(0, 2), 16);
+                const g2 = parseInt(endHex.substring(2, 4), 16);
+                const b2 = parseInt(endHex.substring(4, 6), 16);
+                
+                const r = Math.round(r1 + (r2 - r1) * ratio).toString(16).padStart(2, '0');
+                const g = Math.round(g1 + (g2 - g1) * ratio).toString(16).padStart(2, '0');
+                const b = Math.round(b1 + (b2 - b1) * ratio).toString(16).padStart(2, '0');
+                
+                return r + g + b;
+            }
+            
+            // Копирование в буфер обмена
+            function copyToClipboard(text) {
+                navigator.clipboard.writeText(text).then(() => {
+                    copyNotification.classList.add('show');
+                    setTimeout(() => {
+                        copyNotification.classList.remove('show');
+                    }, 3000);
+                });
+            }
+            
+            // Обработчик копирования
+            copyResultBtn.addEventListener('click', function() {
+                const textToCopy = result.innerText;
+                if (textToCopy) {
+                    copyToClipboard(textToCopy);
+                }
+            });
+            
+            // Автоматическая генерация при изменении
+            textInput.addEventListener('input', generateRGB);
+            startColor.addEventListener('input', generateRGB);
+            endColor.addEventListener('input', generateRGB);
+            effect.addEventListener('change', generateRGB);
+            
+            // Инициализация при загрузке
+            generateRGB();
+        });
+    </script>
+</body>
+</html>
